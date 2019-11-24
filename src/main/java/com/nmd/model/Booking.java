@@ -1,28 +1,44 @@
 package com.nmd.model;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public class Booking {
-    private Integer id;
-    private String vehicleId;
+    private UUID id;
+    private Vehicle vehicle;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+    private Slot slot;
+    private PaymentDetail paymentDetail;
 
 
-    public Integer getId() {
+    public Booking(UUID id, Vehicle vehicle, LocalDateTime startTime) {
+        this.id = id;
+        this.vehicle = vehicle;
+        this.startTime = startTime;
+    }
+
+    public Booking(UUID id, Vehicle vehicle, LocalDateTime startTime, Slot slot) {
+        this.id = id;
+        this.vehicle = vehicle;
+        this.startTime = startTime;
+        this.slot = slot;
+    }
+
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
-    public String getVehicleId() {
-        return vehicleId;
+    public Vehicle getVehicle() {
+        return vehicle;
     }
 
-    public void setVehicleId(String vehicleId) {
-        this.vehicleId = vehicleId;
+    public void setVehicle(Vehicle vehicle) {
+        this.vehicle = vehicle;
     }
 
     public LocalDateTime getStartTime() {
@@ -39,5 +55,36 @@ public class Booking {
 
     public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
+    }
+
+    public Slot getSlot() {
+        return slot;
+    }
+
+    public void setSlot(Slot slot) {
+        this.slot = slot;
+    }
+
+    public PaymentDetail getPaymentDetail() {
+        return paymentDetail;
+    }
+
+    public void setPaymentDetail(PaymentDetail paymentDetail) {
+        this.paymentDetail = paymentDetail;
+    }
+
+    @Override
+    public String toString() {
+        return "Booking{" +
+                "id=" + id +
+                ", vehicle=" + vehicle +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                ", slot=" + slot +
+                '}';
+    }
+
+    public boolean isValid() {
+        return id != null && vehicle.isValid() && startTime != null && slot.isValid();
     }
 }

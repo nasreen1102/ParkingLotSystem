@@ -48,4 +48,12 @@ public class Slot {
     public void setBooking(Booking booking) {
         this.booking = booking;
     }
+
+    public Boolean isBooked(){
+        return booking != null;
+    }
+
+    public boolean isValid() {
+        return id!=null && VehicleType.isValid(vehicleType) && parkingLot.isValid();
+    }
 }

@@ -27,4 +27,7 @@ public class ParkingLot {
         this.slots = slots;
     }
 
+    public boolean isValid() {
+        return id!=null && slots != null;
+    }
 }

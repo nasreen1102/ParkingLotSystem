@@ -2,8 +2,10 @@ package com.nmd.model;
 
 import com.nmd.enums.VehicleType;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ParkingLotDetails {
     private  List<Slot> slots;
@@ -31,7 +33,9 @@ public class ParkingLotDetails {
     }
 
     public Map<VehicleType, List<Slot>> getSlotTypeToSlotMap() {
-//todo:
-        return  null;
+        if(slots==null){
+            return Collections.emptyMap();
+        }
+       return slots.stream().collect(Collectors.groupingBy(Slot::getVehicleType));
     }
 }

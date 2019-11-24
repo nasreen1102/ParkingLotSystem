@@ -13,6 +13,10 @@ public enum VehicleType {
         this.specification = specification;
     }
 
+    public static boolean isValid(VehicleType vehicleType) {
+        return VehicleType.getById(vehicleType.getId()) !=null;
+    }
+
     public Integer getId() {
         return id;
     }
@@ -21,9 +25,9 @@ public enum VehicleType {
         return specification;
     }
 
-    public static VehicleType getById(Integer slotTypeId){
+    public static VehicleType getById(Integer vehicleTypeId){
         for (VehicleType vehicleType : VehicleType.values()) {
-            if(slotTypeId.equals(vehicleType.getId())){
+            if(vehicleTypeId.equals(vehicleType.getId())){
                 return vehicleType;
             }
         }
