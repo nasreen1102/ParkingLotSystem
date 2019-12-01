@@ -11,13 +11,6 @@ public class Booking {
     private Slot slot;
     private PaymentDetail paymentDetail;
 
-
-    public Booking(UUID id, Vehicle vehicle, LocalDateTime startTime) {
-        this.id = id;
-        this.vehicle = vehicle;
-        this.startTime = startTime;
-    }
-
     public Booking(UUID id, Vehicle vehicle, LocalDateTime startTime, Slot slot) {
         this.id = id;
         this.vehicle = vehicle;

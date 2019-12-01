@@ -36,18 +36,18 @@ public class ParkingLotutil {
 
     private static List<Slot> getParkingSlotDetails(Set<VehicleType> vehicleTypes) {
 
-        ParkingLot pl = new ParkingLot(UUID.randomUUID());
+        ParkingLot parkingLot = new ParkingLot(UUID.randomUUID());
         int count=0;
         List<Slot> slots = new LinkedList<>();
-        for (VehicleType sType : vehicleTypes) {
+        for (VehicleType vehicleType : vehicleTypes) {
             sc.nextLine();
-            System.out.println("Enter the total no of " + sType + " slots for your Parking Lot");
+            System.out.println("Enter the total no of " + vehicleType + " slots for your Parking Lot");
             int noOfSlots = count + sc.nextInt();
-            List<Slot> slotList = IntStream.range(count, noOfSlots).boxed().map(id-> new Slot(id, sType, pl)).collect(Collectors.toList());
+            List<Slot> slotList = IntStream.range(count, noOfSlots).boxed().map(id-> new Slot(id, vehicleType, parkingLot)).collect(Collectors.toList());
             count += noOfSlots;
             slots.addAll(slotList);
         }
-        pl.setSlots(slots);
+        parkingLot.setSlots(slots);
         return slots;
     }
 

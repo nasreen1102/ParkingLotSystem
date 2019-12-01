@@ -8,9 +8,6 @@ public class Slot {
     private ParkingLot parkingLot;
     private Booking booking;
 
-    public Slot() {
-    }
-
     public Slot(Integer id, VehicleType vehicleType, ParkingLot parkingLot) {
         this.id = id;
         this.vehicleType = vehicleType;

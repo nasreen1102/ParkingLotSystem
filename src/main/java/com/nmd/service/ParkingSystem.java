@@ -70,7 +70,7 @@ public class ParkingSystem {
 
     public void release(Booking booking){
         if (booking == null || !booking.isValid()) {
-            System.out.println("Please submit booking details");
+            System.out.println("Please submit a valid booking");
             return;
         }
 

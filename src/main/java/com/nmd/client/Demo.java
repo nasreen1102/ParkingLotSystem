@@ -2,8 +2,14 @@ package com.nmd.client;
 
 import com.nmd.enums.VehicleType;
 import com.nmd.model.Booking;
+import com.nmd.model.ParkingLot;
+import com.nmd.model.Slot;
 import com.nmd.model.Vehicle;
 import com.nmd.service.ParkingSystem;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.UUID;
 
 public class Demo {
 
@@ -29,5 +35,9 @@ public class Demo {
         //case2: release a slot of different type and assign another vehicle
         parkingSystem.release(busBooking1);
         parkingSystem.allot(car);
+
+        ParkingLot parkingLot = new ParkingLot(UUID.randomUUID());
+        parkingLot.setSlots(new ArrayList<>());
+        parkingSystem.release(new Booking(UUID.randomUUID(), scooter, LocalDateTime.now(), new Slot(1, scooter.getVehicleType(), parkingLot)));
     }
 }
