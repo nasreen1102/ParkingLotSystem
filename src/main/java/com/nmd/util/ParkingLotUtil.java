@@ -10,7 +10,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class ParkingLotutil {
+public class ParkingLotUtil {
     private static Scanner sc = new Scanner(System.in);
 
     public static ParkingLotDetails buildParkingLot() {
@@ -105,12 +105,16 @@ public class ParkingLotutil {
         return next;
     }
 
-    private static void availableVehicleTypes(Set<VehicleType> selectedVehicleTypes) {
+    public static Set<VehicleType> availableVehicleTypes(Set<VehicleType> selectedVehicleTypes) {
+        Set<VehicleType> remainingVehicleTypes = new HashSet<>();
         for (VehicleType vehicleType : VehicleType.values()) {
             if(!selectedVehicleTypes.contains(vehicleType)) {
-                System.out.println(vehicleType.getId() + "." + vehicleType.name());
+               // System.out.println(vehicleType.getId() + "." + vehicleType.name());
+                remainingVehicleTypes.add(vehicleType);
             }
         }
+
+        return remainingVehicleTypes;
     }
 
     public static void main(String[] args) {

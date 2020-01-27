@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Features</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+</head>
+<body style="text-align:left;font-family:Verdana">
+<h3>Listing parking lot features</h3>
+<hr/>
+<br/>
+
+<ol>
+Dropdown to list all the onboarded parking lots. For the choosen parking lot show the features of
+    <li>
+        Show Layout: <a th:href="@{/parking-lot/{id}(id = selected parkinglot's id)/layout}" class="btn btn-primary" style="margin-right:32px"> <h4> Layout </h4> </a>
+    </li>
+     <br/>
+    <li>
+        Allot: <a href="@{/parking-lot/parking-form}" class="btn btn-primary" style="margin-right:32px"> <h4> Park Vehicle </h4> </a>
+    </li>
+    <br/>
+
+    <li>
+        Release: <a href="/parking_release" class="btn btn-primary" style="margin-right:32px"> <h4> Release Vehicle </h4> </a>
+    </li>
+</ol>
+
+
+
+</body>
+</html>

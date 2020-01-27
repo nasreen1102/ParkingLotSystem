@@ -2,35 +2,55 @@ package com.nmd.service;
 
 import com.nmd.enums.VehicleType;
 import com.nmd.model.*;
-import com.nmd.util.ParkingLotutil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import java.awt.print.Book;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-public class ParkingSystem {
-    private  List<Slot> slots;
-    private Map<VehicleType, List<Slot>> slotTypeToSlotMap;
-    private Map<VehicleType, ParkingFare> slotTypeToParkingFareMap;
+@Component
+public class ParkingService {
+    private Map<VehicleType, List<Slot>> vehicleTypeToSlotsMap;
+    private Map<VehicleType, ParkingFare> vehicleTypeParkingFareMap;
+    private Map<UUID, ParkingLot> parkingLotMap;
 
-    //todo: Annotate
+    @Autowired
     PaymentService paymentService;
 
-    public ParkingSystem() {
-        ParkingLotDetails parkingLotDetails = ParkingLotutil.buildParkingLot();
-        this.slotTypeToSlotMap = parkingLotDetails.getSlotTypeToSlotMap();
-        this.slotTypeToParkingFareMap = parkingLotDetails.getSlotTypeParkingFareMap();
-        this.slots = parkingLotDetails.getSlots();
+    public ParkingService() {
+        vehicleTypeToSlotsMap = new HashMap<>();
+        parkingLotMap = new HashMap<>();
+        setParkingLotDetail(onboardParkingLot()); //todo: remove
         paymentService = new PaymentService();
     }
 
-    public void showLayout(){
+    public void setParkingLotDetail(ParkingLotDetail parkingLotDetail) {
+        vehicleTypeParkingFareMap = parkingLotDetail.getParkingFares().stream().collect(Collectors.toMap(ParkingFare::getVehicleType, pf -> pf));
+        ParkingLot parkingLot = new ParkingLot(parkingLotDetail.getParkingLotId());
+        Map<VehicleType, Integer> vehicleTypeToSlotCountMap = parkingLotDetail.getVehicleTypeToSlotCountMap();
+        int count=0;
+        for (VehicleType vehicleType : vehicleTypeToSlotCountMap.keySet()) {
+            int noOfSlots = count + vehicleTypeToSlotCountMap.get(vehicleType);
+            List<Slot> slotList = IntStream.range(count, noOfSlots).boxed().map(id-> new Slot(id, vehicleType, parkingLot)).collect(Collectors.toList());
+            count += noOfSlots;
+            this.vehicleTypeToSlotsMap.put(vehicleType, slotList);
+            parkingLot.getSlots().addAll(slotList);
+        }
+        parkingLotMap.put(parkingLot.getId(), parkingLot);
+    }
+
+
+    public void showLayout(UUID id){
+        ParkingLot parkingLot = parkingLotMap.get(id);
+        if(parkingLot==null || parkingLot.isNotValid()){
+            System.out.println("No parkingLot found with id: "+id);
+            return;
+        }
+        List<Slot> slots = parkingLot.getSlots();
         int column = 10;
         System.out.println("***********parking layout***********");
         System.out.println("--------------------------------------");
@@ -51,8 +71,25 @@ public class ParkingSystem {
 
     }
 
+    public Layout layout(UUID id){
+        ParkingLot parkingLot = parkingLotMap.get(id);
+        if(parkingLot==null || parkingLot.isNotValid()){
+            System.out.println("No parkingLot found with id: "+id);
+            return null;
+        }
+
+        Layout layout = new Layout();
+        layout.setParkingLotId(parkingLot.getId());
+        Map<VehicleType, SlotLayout> vehicleTypeSlotLayoutMap = parkingLot.getSlots().stream().map(m -> {
+            return new SlotLayout(m.getId(), m.getVehicleType(), m.isBooked());
+        }).collect(Collectors.toMap(SlotLayout::getVehicleType, slotLayout -> slotLayout));
+        layout.setVehicleTypeSlotLayoutMap(vehicleTypeSlotLayoutMap);
+
+        return layout;
+
+    }
     public Booking allot(Vehicle vehicle){
-        List<Slot> totalSlots = slotTypeToSlotMap.get(vehicle.getVehicleType());
+        List<Slot> totalSlots = vehicleTypeToSlotsMap.get(vehicle.getVehicleType());
         Predicate<Slot> isBooked = Slot::isBooked;
         Predicate<Slot> isNotBooked = isBooked.negate();
         List<Slot> availableSlots = totalSlots.stream().filter(isNotBooked).collect(Collectors.toList());
@@ -75,7 +112,7 @@ public class ParkingSystem {
         }
 
         VehicleType vehicleType = booking.getVehicle().getVehicleType();
-        List<Slot> allSlots = slotTypeToSlotMap.get(vehicleType);
+        List<Slot> allSlots = vehicleTypeToSlotsMap.get(vehicleType);
         Slot bookedSlot = allSlots.stream().filter(slot -> slot.getBooking().equals(booking)).findFirst().orElse(null);
         if(bookedSlot == null){
             System.out.println("Invalid Booking");
@@ -85,7 +122,7 @@ public class ParkingSystem {
         LocalDateTime endTime = LocalDateTime.now();
         long totalHours = ChronoUnit.HOURS.between(booking.getStartTime(), endTime);
         long totalMinutes = ChronoUnit.MINUTES.between(booking.getStartTime(),endTime) - (totalHours*60);
-        ParkingFare parkingFare = slotTypeToParkingFareMap.get(vehicleType);
+        ParkingFare parkingFare = vehicleTypeParkingFareMap.get(vehicleType);
         float fare = parkingFare.getFirstOneHourFare() + (totalHours!=0 ? ((totalHours - 1) * parkingFare.getNextEachHourFare()) : 0)
                 + (totalMinutes!=0 ? (totalMinutes * parkingFare.getNextEachHourFare() / 60): 0);
         System.out.println("Parking fare for "+vehicleType.name()+" is "+fare);
@@ -114,4 +151,20 @@ public class ParkingSystem {
 
     }
 
+    public ParkingLotDetail onboardParkingLot() {
+        ParkingFare carParkingFare = new ParkingFare(VehicleType.CAR, 1f,2f);
+        ParkingFare scooterParkingFare = new ParkingFare(VehicleType.SCOOTER, 3f,4f);
+        ParkingFare busParkingFare = new ParkingFare(VehicleType.BUS, 5f,6f);
+        Map<VehicleType, Integer> vehicleTypeToSlotCountMap = new HashMap<>();
+        vehicleTypeToSlotCountMap.put(VehicleType.CAR, 1);
+        vehicleTypeToSlotCountMap.put(VehicleType.SCOOTER,1);
+        vehicleTypeToSlotCountMap.put(VehicleType.BUS,1);
+
+        ParkingLotDetail parkingLotDetail = new ParkingLotDetail();
+        parkingLotDetail.setParkingLotId(UUID.randomUUID());
+        parkingLotDetail.setVehicleTypeToSlotCountMap(vehicleTypeToSlotCountMap);
+        parkingLotDetail.setParkingFares(Arrays.asList(carParkingFare,scooterParkingFare, busParkingFare));
+
+        return parkingLotDetail;
+    }
 }

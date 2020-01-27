@@ -1,5 +1,6 @@
 package com.nmd.model;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -9,6 +10,7 @@ public class ParkingLot {
 
     public ParkingLot(UUID id) {
         this.id = id;
+        this.slots = new LinkedList<>();
     }
 
     public UUID getId() {
@@ -29,5 +31,9 @@ public class ParkingLot {
 
     public boolean isValid() {
         return id!=null && slots != null;
+    }
+
+    public boolean isNotValid() {
+        return !isValid();
     }
 }

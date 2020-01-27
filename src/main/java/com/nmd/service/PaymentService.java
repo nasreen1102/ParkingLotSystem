@@ -4,8 +4,10 @@ import com.nmd.enums.PaymentCardType;
 import com.nmd.model.Booking;
 import com.nmd.model.CardPayment;
 import com.nmd.model.PaymentDetail;
+import org.springframework.stereotype.Service;
 
-public class PaymentService {
+@Service
+class PaymentService {
 
 
     public PaymentDetail pay(float fare, Booking booking) {

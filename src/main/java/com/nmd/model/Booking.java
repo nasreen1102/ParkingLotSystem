@@ -1,6 +1,7 @@
 package com.nmd.model;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 public class Booking {
@@ -79,5 +80,21 @@ public class Booking {
 
     public boolean isValid() {
         return id != null && vehicle.isValid() && startTime != null && slot.isValid();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Booking booking = (Booking) o;
+        return getId().equals(booking.getId()) &&
+                getVehicle().equals(booking.getVehicle()) &&
+                getStartTime().equals(booking.getStartTime()) &&
+                getSlot().equals(booking.getSlot());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getVehicle(), getStartTime(), getSlot());
     }
 }
